@@ -1,0 +1,20 @@
+/* The Marlowe Job — page chrome. The game is one 1280x720 canvas; the page
+   is just a dark frame around it so screenshots capture the game and nothing else. */
+html, body {
+  margin: 0;
+  padding: 0;
+  background: #05070a;
+  min-height: 100vh;
+}
+body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+#game {
+  display: block;
+  width: 1280px;
+  height: 720px;
+  background: #0b0e13;
+  outline: none;
+}

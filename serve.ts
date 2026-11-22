@@ -1,14 +1,18 @@
-// Development server for The Marlowe Job (Node 22, standard library only).
-// Serves game/ on http://localhost:8080 so the game can be played in desktop
-// Chrome exactly as the grader's static hosting serves it. Usage: node serve.ts
+// A tiny static server for local play (Node 22, standard library only):
+// `node serve.ts` serves game/ on http://localhost:8080. It answers only
+// files inside game/, sends the MIME types a browser game needs, and
+// otherwise does nothing clever. Development convenience, not a server.
 
+import { createReadStream, statSync } from 'node:fs';
 import { createServer } from 'node:http';
-import { readFile } from 'node:fs/promises';
-import { join, extname } from 'node:path';
+import { extname, join, normalize, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const here = fileURLToPath(new URL('.', import.meta.url));
-const root = join(here, 'game');
+const gameRoot = resolve(fileURLToPath(new URL('./game', import.meta.url)));
+const argv = process.argv.slice(2);
+const portAt = argv.indexOf('--port');
+const wanted = portAt === -1 ? 8080 : Number(argv[portAt + 1]);
+const port = Number.isInteger(wanted) && wanted > 0 && wanted < 65536 ? wanted : 8080;
 
 const TYPES = {
   '.html': 'text/html; charset=utf-8',
@@ -21,24 +25,35 @@ const TYPES = {
   '.jpeg': 'image/jpeg',
 };
 
-const server = createServer(async (req, res) => {
+createServer((req, res) => {
+  let path;
   try {
-    const path = req.url.split('?')[0];
-    const file = join(root, path === '/' ? 'index.html' : path);
-    if (!file.startsWith(root)) {
-      res.writeHead(403);
-      res.end('forbidden');
-      return;
-    }
-    const data = await readFile(file);
-    res.writeHead(200, { 'Content-Type': TYPES[extname(file)] ?? 'application/octet-stream' });
-    res.end(data);
+    path = decodeURIComponent(new URL(req.url ?? '/', 'http://localhost').pathname);
   } catch {
-    res.writeHead(404);
-    res.end('not found');
+    res.writeHead(400).end('bad request');
+    return;
   }
-});
-
-server.listen(8080, () => {
-  console.log('The Marlowe Job at http://localhost:8080');
+  if (path.endsWith('/')) path += 'index.html';
+  const file = resolve(join(gameRoot, normalize(path)));
+  if (file !== gameRoot && !file.startsWith(gameRoot + sep)) {
+    res.writeHead(403).end('forbidden');
+    return;
+  }
+  let size;
+  try {
+    const st = statSync(file);
+    if (!st.isFile()) throw new Error('not a file');
+    size = st.size;
+  } catch {
+    res.writeHead(404).end('not found');
+    return;
+  }
+  res.writeHead(200, {
+    'content-type': TYPES[extname(file).toLowerCase()] ?? 'application/octet-stream',
+    'content-length': size,
+    'cache-control': 'no-store',
+  });
+  createReadStream(file).pipe(res);
+}).listen(port, '127.0.0.1', () => {
+  console.log(`game/ is on http://localhost:${port}`);
 });

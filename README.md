@@ -20,7 +20,7 @@ You are Rook, a thief with one night to hit the Marlowe Museum. Three rooms, one
 - **Guards** patrol waypoint loops with vision cones. Being seen fills suspicion; a full bar gives you a fair warning — a red "!" and a grace second — before the guard gives chase. Break line of sight and the guard searches your last seen spot, then walks back.
 - **Cameras** sweep red cones across the room. **Lasers** (Vault Hall) slide a gap along each beam — time your crossing.
 - **The alarm** (0–100%) rises while anyone sees you and bleeds off in the dark. At 100% the museum locks down and you are caught. Three lives per run.
-- **Routes:** every room has more than one way through — the open floor, a side corridor, and an old air vent (hold E at a grate to crawl through). Loot is a choice, not a chore: paintings and gold bars pay, but every second in the open is risk.
+- **Routes:** every room has more than one way through — the open floor, a side corridor, and an old air vent (E at a grate to crawl through). Loot is a choice, not a chore: paintings and gold bars pay, but every second in the open is risk.
 - **Scoring:** loot value + time bonus under par + a $5,000 Ghost bonus when the alarm never passes 25%. Ratings: Ghost, Professional, Smash-and-Grab.
 
 ## Run it
@@ -36,17 +36,17 @@ No build step, no network requests, no libraries. `main.ts` (Node 22) hands the 
 
 | File | Job |
 | --- | --- |
-| `game/src/main.js` | Boot + fixed-step loop |
-| `game/src/game.js` | Screens, rules, scoring |
-| `game/src/levels.js` | The three hand-drawn rooms |
-| `game/src/player.js` | The thief: movement + stance |
-| `game/src/guard.js` | Patrol AI, cones, suspicion, chase |
-| `game/src/security.js` | Cameras, lasers, the alarm meter |
-| `game/src/render.js` | Every pixel: floor plan, HUD, screens |
-| `game/src/geom.js` | Collision + line of sight |
-| `game/src/input.js` | Keyboard + mouse |
-| `game/src/audio.js` | Synthesized sound effects |
-| `game/src/shots.js` | Staged screenshot scenes |
-| `game/src/config.js` | Constants + palette + tuning |
+| `game/src/boot.js` | Boot + fixed-step loop + HUD |
+| `game/src/state.js` | Screens, rooms, loot, lives, score |
+| `game/src/rooms.js` | The three hand-drawn rooms |
+| `game/src/thief.js` | The thief: movement + stance |
+| `game/src/patrol.js` | Guard AI, cones, suspicion, chase |
+| `game/src/devices.js` | Cameras, lasers, the alarm meter |
+| `game/src/draw.js` | Every pixel: floor plan, HUD, screens |
+| `game/src/collide.js` | Collision + line of sight |
+| `game/src/keys.js` | Keyboard + mouse |
+| `game/src/sfx.js` | Synthesized sound effects |
+| `game/src/stage.js` | Staged screenshot scenes |
+| `game/src/tune.js` | Constants + palette + tuning |
 | `main.ts` | Entry point: builds `/output` + dossier |
 | `serve.ts` | Local static server |
